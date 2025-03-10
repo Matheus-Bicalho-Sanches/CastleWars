@@ -24,15 +24,21 @@ exec('git status', (error, stdout, stderr) => {
   // Perguntar se deseja adicionar todos os arquivos
   rl.question('Deseja adicionar todos os arquivos modificados? (s/n): ', (answer) => {
     if (answer.toLowerCase() === 's' || answer.toLowerCase() === 'sim') {
-      exec('git add .', (error) => {
-        if (error) {
-          console.error(`Erro ao adicionar arquivos: ${error.message}`);
-          rl.close();
-          return;
-        }
-        
-        console.log('Todos os arquivos foram adicionados.');
-        askForCommitMessage();
+      console.log('\nAdicionando arquivos (exceto node_modules e arquivos grandes)...');
+      
+      // Primeiro, atualiza o .gitignore se necessário
+      ensureGitIgnore(() => {
+        // Usamos uma sequência de comandos para evitar adicionar node_modules
+        exec('git add .gitignore README.md index.html package.json vercel.json vite.config.js commit.js commit.bat .editorconfig .eslintrc.cjs LICENSE create-placeholders.js log.js src/ public/', (error) => {
+          if (error) {
+            console.error(`Erro ao adicionar arquivos: ${error.message}`);
+            rl.close();
+            return;
+          }
+          
+          console.log('Arquivos selecionados foram adicionados (exceto node_modules e arquivos muito grandes).');
+          askForCommitMessage();
+        });
       });
     } else {
       console.log('\nVocê optou por não adicionar todos os arquivos automaticamente.');
@@ -51,6 +57,72 @@ exec('git status', (error, stdout, stderr) => {
   });
 });
 
+// Função para garantir que node_modules esteja no .gitignore
+function ensureGitIgnore(callback) {
+  const fs = require('fs');
+  const path = require('path');
+  
+  const gitignorePath = path.join(__dirname, '.gitignore');
+  
+  // Verifica se o arquivo .gitignore existe
+  if (fs.existsSync(gitignorePath)) {
+    let content = fs.readFileSync(gitignorePath, 'utf8');
+    
+    // Lista de entradas que devem estar no .gitignore
+    const requiredEntries = [
+      'node_modules/',
+      '/node_modules',
+      '/dist',
+      '/.env',
+      '/.env.local'
+    ];
+    
+    let updated = false;
+    
+    // Adiciona as entradas que não existem
+    for (const entry of requiredEntries) {
+      if (!content.includes(entry)) {
+        content += `\n${entry}`;
+        updated = true;
+      }
+    }
+    
+    // Atualiza o arquivo se necessário
+    if (updated) {
+      fs.writeFileSync(gitignorePath, content);
+      console.log('Arquivo .gitignore atualizado com entradas necessárias.');
+    }
+  } else {
+    // Cria um arquivo .gitignore básico se não existir
+    const basicContent = 
+`# Dependências
+node_modules/
+/node_modules
+
+# Produção
+/dist
+/build
+
+# Ambiente
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log`;
+    
+    fs.writeFileSync(gitignorePath, basicContent);
+    console.log('Arquivo .gitignore criado com configurações básicas.');
+  }
+  
+  callback();
+}
+
 function askForCommitMessage() {
   rl.question('\nDigite a mensagem do commit: ', (commitMessage) => {
     if (!commitMessage.trim()) {
@@ -63,6 +135,7 @@ function askForCommitMessage() {
     exec(`git commit -m "${commitMessage}"`, (error, stdout, stderr) => {
       if (error) {
         console.error(`Erro ao fazer commit: ${error.message}`);
+        if (stderr) console.error(stderr);
         rl.close();
         return;
       }
@@ -73,9 +146,11 @@ function askForCommitMessage() {
       // Perguntar se deseja fazer push
       rl.question('Deseja fazer push para o repositório remoto? (s/n): ', (answer) => {
         if (answer.toLowerCase() === 's' || answer.toLowerCase() === 'sim') {
+          console.log('\nFazendo push para o repositório remoto...');
           exec('git push', (error, stdout, stderr) => {
             if (error) {
               console.error(`Erro ao fazer push: ${error.message}`);
+              if (stderr) console.error(stderr);
               rl.close();
               return;
             }
