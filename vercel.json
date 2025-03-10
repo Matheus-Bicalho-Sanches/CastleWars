@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "/assets/(.*)", "dest": "/assets/$1" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ],
+  "build": {
+    "env": {
+      "NODE_ENV": "production"
+    }
+  },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Cross-Origin-Embedder-Policy", "value": "require-corp" },
+        { "key": "Cross-Origin-Opener-Policy", "value": "same-origin" }
+      ]
+    }
+  ]
+} 
