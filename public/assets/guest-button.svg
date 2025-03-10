@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="60" viewBox="0 0 200 60">
+  <!-- Fundo do botão -->
+  <linearGradient id="buttonGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" style="stop-color:#777777;stop-opacity:1" />
+    <stop offset="100%" style="stop-color:#444444;stop-opacity:1" />
+  </linearGradient>
+  
+  <!-- Botão principal -->
+  <rect x="5" y="5" width="190" height="50" rx="10" ry="10" fill="url(#buttonGradient)" stroke="#d4af37" stroke-width="1" />
+  
+  <!-- Bordas decorativas -->
+  <rect x="10" y="10" width="180" height="40" rx="8" ry="8" fill="none" stroke="#d4af37" stroke-width="1" stroke-dasharray="1,1" />
+  
+  <!-- Texto do botão -->
+  <text x="100" y="38" font-family="serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#d4af37">Jogar como Convidado</text>
+</svg> 
