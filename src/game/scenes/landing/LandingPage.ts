@@ -1,6 +1,14 @@
 import { GameObjects, Scene } from 'phaser';
 import { EventBus } from '../../EventBus';
 
+// Tipos de modais de autenticação
+export enum AuthModalType {
+  NONE = 'none',
+  LOGIN = 'login',
+  REGISTER = 'register',
+  FORGOT_PASSWORD = 'forgot_password'
+}
+
 export class LandingPage extends Scene {
     // Elementos da UI
     private background: GameObjects.Image;
@@ -15,6 +23,9 @@ export class LandingPage extends Scene {
     
     // Descrição do jogo
     private gameDescription: GameObjects.Text;
+    
+    // Controle de modal de autenticação
+    private currentAuthModal: AuthModalType = AuthModalType.NONE;
     
     constructor() {
         super('LandingPage');
@@ -114,27 +125,32 @@ export class LandingPage extends Scene {
     
     // Handlers dos botões
     private onLoginClick() {
-        console.log('Login clicado - Implementação futura');
+        console.log('Login clicado');
         
-        // Por enquanto, apenas mostramos uma mensagem e vamos para o menu principal
-        this.showMessage('Sistema de login será implementado em breve.\nEntrando como convidado...', () => {
-            this.scene.start('MainMenu');
-        });
+        // Emitir evento para abrir o modal de login no React
+        EventBus.emit('open-auth-modal', AuthModalType.LOGIN);
+        this.currentAuthModal = AuthModalType.LOGIN;
     }
     
     private onRegisterClick() {
-        console.log('Registro clicado - Implementação futura');
+        console.log('Registro clicado');
         
-        // Por enquanto, apenas mostramos uma mensagem e vamos para o menu principal
-        this.showMessage('Sistema de registro será implementado em breve.\nEntrando como convidado...', () => {
-            this.scene.start('MainMenu');
-        });
+        // Emitir evento para abrir o modal de registro no React
+        EventBus.emit('open-auth-modal', AuthModalType.REGISTER);
+        this.currentAuthModal = AuthModalType.REGISTER;
     }
     
     private onGuestClick() {
         console.log('Modo convidado selecionado');
         
         // Vai direto para o menu principal
+        this.scene.start('MainMenu');
+    }
+    
+    // Método para ser chamado pelo React após um login/registro bem-sucedido
+    public onAuthSuccess() {
+        // Fechar o modal e ir para o menu principal
+        this.currentAuthModal = AuthModalType.NONE;
         this.scene.start('MainMenu');
     }
     
