@@ -2,12 +2,16 @@ import { useRef, useState, useEffect } from 'react';
 import { IRefPhaserGame, PhaserGame } from './game/PhaserGame';
 import { AuthProvider } from './firebase/AuthContext';
 import AuthModal from './components/auth/AuthModal';
+import HomePage from './components/HomePage';
 import { EventBus } from './game/EventBus';
 import { AuthModalType } from './game/scenes/landing/LandingPage';
 
 function App() {
     // Referência ao componente do jogo Phaser
     const phaserRef = useRef<IRefPhaserGame | null>(null);
+    
+    // Estado para controlar qual tela mostrar
+    const [showGame, setShowGame] = useState(false);
     
     // Estado do modal de autenticação
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -53,11 +57,20 @@ function App() {
             }
         }
     }
+    
+    // Iniciar o jogo a partir da HomePage
+    const handleStartGame = () => {
+        setShowGame(true);
+    }
 
     return (
         <AuthProvider>
-            <div id="app">
-                <PhaserGame ref={phaserRef} currentActiveScene={currentScene} />
+            <div id="app" className={showGame ? 'game-active' : ''}>
+                {showGame ? (
+                    <PhaserGame ref={phaserRef} currentActiveScene={currentScene} />
+                ) : (
+                    <HomePage onStartGame={handleStartGame} />
+                )}
                 
                 <AuthModal 
                     isOpen={isAuthModalOpen}
