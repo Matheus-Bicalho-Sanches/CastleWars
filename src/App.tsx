@@ -1,18 +1,13 @@
-import { useRef, useState, useEffect } from 'react';
-import { IRefPhaserGame, PhaserGame } from './game/PhaserGame';
+import { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './firebase/AuthContext';
 import AuthModal from './components/auth/AuthModal';
 import HomePage from './components/HomePage';
+import GamePage from './components/GamePage';
 import { EventBus } from './game/EventBus';
 import { AuthModalType } from './game/scenes/landing/LandingPage';
 
 function App() {
-    // Referência ao componente do jogo Phaser
-    const phaserRef = useRef<IRefPhaserGame | null>(null);
-    
-    // Estado para controlar qual tela mostrar
-    const [showGame, setShowGame] = useState(false);
-    
     // Estado do modal de autenticação
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const [authModalType, setAuthModalType] = useState<AuthModalType>(AuthModalType.NONE);
@@ -34,11 +29,6 @@ function App() {
         };
     }, []);
 
-    // Evento emitido pelo componente PhaserGame
-    const currentScene = (scene: Phaser.Scene) => {
-        console.log('Cena atual:', scene.scene.key);
-    }
-
     // Fechar o modal de autenticação
     const closeAuthModal = () => {
         setIsAuthModalOpen(false);
@@ -47,38 +37,34 @@ function App() {
     // Ao completar autenticação com sucesso
     const handleAuthSuccess = () => {
         setIsAuthModalOpen(false);
-        
-        // Notifica o jogo que a autenticação foi bem-sucedida
-        if (phaserRef.current && phaserRef.current.scene) {
-            const scene = phaserRef.current.scene;
-            if (scene.scene.key === 'LandingPage') {
-                // Se estiver na cena LandingPage, chame o método onAuthSuccess
-                (scene as any).onAuthSuccess();
-            }
-        }
-    }
-    
-    // Iniciar o jogo a partir da HomePage
-    const handleStartGame = () => {
-        setShowGame(true);
     }
 
     return (
         <AuthProvider>
-            <div id="app" className={showGame ? 'game-active' : ''}>
-                {showGame ? (
-                    <PhaserGame ref={phaserRef} currentActiveScene={currentScene} />
-                ) : (
-                    <HomePage onStartGame={handleStartGame} />
-                )}
-                
-                <AuthModal 
-                    isOpen={isAuthModalOpen}
-                    modalType={authModalType}
-                    onClose={closeAuthModal}
-                    onSuccess={handleAuthSuccess}
-                />
-            </div>
+            <Router>
+                <div id="app">
+                    <Routes>
+                        {/* Redirecionar a raiz para a página inicial */}
+                        <Route path="/" element={<Navigate to="/home" replace />} />
+                        
+                        {/* Página inicial */}
+                        <Route path="/home" element={<HomePage />} />
+                        
+                        {/* Página do jogo */}
+                        <Route path="/game" element={<GamePage />} />
+                        
+                        {/* Rota de fallback para qualquer caminho não encontrado */}
+                        <Route path="*" element={<Navigate to="/home" replace />} />
+                    </Routes>
+                    
+                    <AuthModal 
+                        isOpen={isAuthModalOpen}
+                        modalType={authModalType}
+                        onClose={closeAuthModal}
+                        onSuccess={handleAuthSuccess}
+                    />
+                </div>
+            </Router>
         </AuthProvider>
     )
 }

@@ -1,0 +1,51 @@
+.game-navbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+}
+
+.nav-button {
+  background-color: transparent;
+  color: #f5f5dc;
+  border: 1px solid #8b4513;
+  border-radius: 4px;
+  padding: 5px 10px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'MedievalSharp', cursive;
+  min-width: auto;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.back-button:hover {
+  background-color: rgba(139, 69, 19, 0.5);
+}
+
+.logout-button {
+  border-color: #a52a2a;
+  margin-left: 10px;
+}
+
+.logout-button:hover {
+  background-color: rgba(165, 42, 42, 0.5);
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+}
+
+.username {
+  color: #d4af37;
+  margin-right: 10px;
+  font-family: 'MedievalSharp', cursive;
+} 

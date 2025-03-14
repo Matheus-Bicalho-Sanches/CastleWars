@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../firebase/AuthContext';
 import { EventBus } from '../game/EventBus';
 import { AuthModalType } from '../game/scenes/landing/LandingPage';
 import './HomePage.css';
 
-const HomePage = ({ onStartGame }: { onStartGame: () => void }) => {
+const HomePage = () => {
   const { currentUser } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
   
   // Simular carregamento de recursos ou verificação de autenticação
   useEffect(() => {
@@ -26,13 +28,18 @@ const HomePage = ({ onStartGame }: { onStartGame: () => void }) => {
     EventBus.emit('open-auth-modal', AuthModalType.REGISTER);
   };
   
+  // Iniciar o jogo ao clicar em jogar
+  const handleStartGame = () => {
+    navigate('/game');
+  };
+  
   // Se o usuário já estiver logado, pode iniciar o jogo diretamente
   useEffect(() => {
     if (currentUser && !isLoading) {
       // Se desejar iniciar automaticamente para usuários logados, descomente:
-      // onStartGame();
+      // navigate('/game');
     }
-  }, [currentUser, isLoading, onStartGame]);
+  }, [currentUser, isLoading, navigate]);
   
   // Tela de carregamento
   if (isLoading) {
@@ -98,7 +105,7 @@ const HomePage = ({ onStartGame }: { onStartGame: () => void }) => {
           {currentUser ? (
             <button 
               className="btn-primary btn-start" 
-              onClick={onStartGame}
+              onClick={handleStartGame}
             >
               Jogar
             </button>
@@ -118,7 +125,7 @@ const HomePage = ({ onStartGame }: { onStartGame: () => void }) => {
               </button>
               <button 
                 className="btn-tertiary btn-guest" 
-                onClick={onStartGame}
+                onClick={handleStartGame}
               >
                 Jogar como Convidado
               </button>

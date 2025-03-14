@@ -5,7 +5,7 @@ import { resolve } from 'path';
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: './',
+  base: '/',
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
@@ -20,9 +20,11 @@ export default defineConfig({
     port: 8080,
     host: true,
     strictPort: true,
+    historyApiFallback: true,
   },
   preview: {
     port: 8080,
+    historyApiFallback: true,
   },
   resolve: {
     alias: {
